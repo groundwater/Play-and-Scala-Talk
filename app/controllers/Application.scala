@@ -11,7 +11,7 @@ object Application extends Controller {
 
   // Prompt User with Login Form
   def login = Action {
-  	TODO
+  	Ok(views.html.login())
   }
   
 }
