@@ -21,8 +21,10 @@ object Application extends Controller {
       "password" -> text))
       
   def authenticate = Action{ implicit request =>
-    val (username, password) = loginForm.bindFromRequest.get   
-    Ok("Success")
+    loginForm.bindFromRequest.fold (
+      hasErrors => BadRequest("Bad Request"),
+      success   => Ok("Success")
+    )
   }
   
 }
