@@ -23,7 +23,7 @@ object Application extends Controller {
   def authenticate = Action{ implicit request =>
     loginForm.bindFromRequest.fold (
       hasErrors => BadRequest("Bad Request"),
-      success   => Ok("Success")
+      success   => Redirect(routes.Application.home(success._1))
     )
   }
   
