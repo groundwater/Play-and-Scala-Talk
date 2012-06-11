@@ -13,7 +13,15 @@ object Authenticate {
       implicit val request = req
       Application.loginForm.bindFromRequest.fold (
     		  hasErrors => Application.BadRequest("Bad Request"),
-    		  success   => block(success._1)(req))
+    		  success   => {
+    		    val username = success._1
+    		    if (username=="bob"){
+    		      block(username)(req)
+    		    } else {
+    		      Application.Unauthorized("Not Authorized")
+    		    }
+    		  }
+      )
     }
   }
   def apply (block: String => Request[AnyContent] => Result): Action[AnyContent] = {
