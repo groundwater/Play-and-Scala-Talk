@@ -7,13 +7,16 @@ import play.api.data.Forms._
 
 trait Authenticate[A] extends Action[A]
 object Authenticate {
-  def apply[A](bodyParser: BodyParser[A])(block: Request[A] => Result) = new Authenticate[A] {
+  def apply[A](bodyParser: BodyParser[A])(block: String => Request[A] => Result) = new Authenticate[A] {
     def parser = bodyParser
     def apply( req: Request[A] ) = {
-      block(req)
+      implicit val request = req
+      Application.loginForm.bindFromRequest.fold (
+    		  hasErrors => Application.BadRequest("Bad Request"),
+    		  success   => block(success._1)(req))
     }
   }
-  def apply (block: Request[AnyContent] => Result): Action[AnyContent] = {
+  def apply (block: String => Request[AnyContent] => Result): Action[AnyContent] = {
     Authenticate(BodyParsers.parse.anyContent)(block)
   }
 }
@@ -34,11 +37,8 @@ object Application extends Controller {
       "username" -> text,
       "password" -> text))
       
-  def authenticate = Authenticate{ Action{ implicit request =>
-    loginForm.bindFromRequest.fold (
-      hasErrors => BadRequest("Bad Request"),
-      success   => Redirect(routes.Application.home(success._1))
-    )
+  def authenticate = Authenticate{ user => Action{ implicit request =>
+      Redirect(routes.Application.home(user))
   }}
   
   def home(id: String) = Action { implicit request =>
