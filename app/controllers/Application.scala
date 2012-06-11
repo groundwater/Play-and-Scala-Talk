@@ -8,5 +8,10 @@ object Application extends Controller {
   def index = Action {
     Ok(views.html.main("Hello World"))
   }
+
+  // Prompt User with Login Form
+  def login = Action {
+  	TODO
+  }
   
 }
